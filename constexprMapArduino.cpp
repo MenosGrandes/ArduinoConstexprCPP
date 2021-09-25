@@ -39,13 +39,14 @@ template <size_t SIZE, class T> struct Array {
   constexpr const T &operator[](size_t __n) const { return _array[__n]; }
   T &operator[](size_t __n) { return _array[__n]; }
 
-  constexpr const T &begin(void) const { return _array[0]; }
-  constexpr T begin(void) { return _array[0]; }
+  // constexpr const T &begin(void) const { return _array[0]; }
+  // constexpr T begin(void) { return _array[0]; }
 
-  constexpr const T &end(void) const { return _array[SIZE - 1]; }
-  constexpr T end(void) { return _array[SIZE - 1]; }
+  // constexpr const T &end(void) const { return _array[SIZE - 1]; }
+  // constexpr T end(void) { return _array[SIZE - 1]; }
 };
 /*Operators*/
+/*
 template <size_t SIZE, typename T>
 std::ostream &operator<<(std::ostream &out, const Array<SIZE, T> &c) {
   out << "Array = [";
@@ -54,7 +55,8 @@ std::ostream &operator<<(std::ostream &out, const Array<SIZE, T> &c) {
   }
   out << " ]";
   return out;
-}
+}*/
+/*
 template <size_t SIZE, typename T>
 constexpr bool operator==(const Array<SIZE, T> &rhs,
                           const Array<SIZE, T> &lhs) {
@@ -70,7 +72,7 @@ constexpr bool operator==(const Array<SIZE, T> &rhs,
   }
   return true;
 }
-
+*/
 template <size_t index, std::size_t _size, typename _Type>
 constexpr const _Type &get(const Array<_size, _Type> &array) {
   return array[index];
@@ -96,9 +98,7 @@ std::ostream &operator<<(std::ostream &out, const Pair<T1, T2> &p) {
 
 template <typename T1, typename T2>
 constexpr bool operator==(const Pair<T1, T2> &rhs, const Pair<T1, T2> &lhs) {
-  constexpr auto same_key = (rhs.key == lhs.key);
-  constexpr auto same_value = (rhs.value == lhs.value);
-  return (same_key & same_value);
+  return ((rhs.key == lhs.key) && (rhs.value == lhs.value)) ? true : false;
 }
 template <typename T1, typename T2>
 constexpr bool operator!=(const Pair<T1, T2> &rhs, const Pair<T1, T2> &lhs) {
@@ -119,16 +119,12 @@ std::ostream &operator<<(std::ostream &out, const C &c) {
   out << "C[a=" << c.a << "| f=" << c.f << "| g=" << c.g << "]";
   return out;
 }
+
 constexpr bool operator==(const C &rhs, const C &lhs) {
-  auto same_a = (rhs.a == lhs.a);
-  auto same_f = (rhs.f == lhs.f);
-  auto same_g = (rhs.g == lhs.g);
-  return (same_a & same_g & same_f);
+  return ((rhs.a == lhs.a) && (rhs.f == lhs.f) && (rhs.g == lhs.g)) ? true
+                                                                    : false;
 }
-template <typename T1, typename T2>
-constexpr bool operator!=(const Pair<T1, T2> &rhs, const Pair<T1, T2> &lhs) {
-  return !(rhs == lhs);
-}
+constexpr bool operator!=(const C &rhs, const C &lhs) { return !(rhs == lhs); }
 int main() {
 
   constexpr size_t size = 2;
@@ -143,12 +139,59 @@ int main() {
   using IntPair = Pair<int, int>;
   constexpr Array<size, IntPair> pair_array = {make_pair(1, 2),
                                                make_pair(3, 4)};
-  std::cout << pair_array[0].key << " " << pair_array[0].value << " \n";
-  std::cout << pair_array[1].key << " " << pair_array[1].value << " \n";
-
-  using CPair = Pair<C, C>;
-  constexpr auto abc = make_pair(C(1, 2, 3), C(4, 5, 6));
   {
+    C a(1, 2, 3);
+    C b(1, 2, 3);
+    C c(2, 1, 3);
+    if (C(1, 2, 3) == C(1, 2, 3)) {
+      std::cout << "takie same \n";
+    }
+    if (C(1, 2, 3) != C(1, 2, 3)) {
+      std::cout << "takie same byc nie powinny \n";
+    }
+
+    std::cout << (a == a) << std::endl;
+    if (a == a) {
+    } else {
+      std::cerr << a << " a==a " << a << "\n";
+    }
+    if (a == b) {
+    } else {
+      std::cerr << a << " a==b " << b << "\n";
+    }
+    if (a == c) {
+      std::cerr << a << " a==c " << c << "\n";
+    }
+    if (a != a) {
+    } else {
+      std::cerr << a << " a!=a " << a << "\n";
+    }
+    if (a != b) {
+    } else {
+      std::cerr << a << " a!=b " << b << "\n";
+    }
+    if (a != c) {
+    } else {
+      std::cerr << a << " a!=c " << c << "\n";
+    }
+
+    using CPair = Pair<C, C>;
+    constexpr auto abc = make_pair(C(1, 2, 3), C(4, 5, 6));
+    constexpr auto abc2 = make_pair(C(1, 2, 3), C(4, 5, 6));
+    constexpr auto abc3 = make_pair(C(1, 4, 3), C(4, 5, 6));
+    {
+      constexpr auto same = (abc == abc);
+      if (!same) {
+        std::cerr << "abc != abc\n";
+      };
+      constexpr auto not_same = (abc != abc);
+      if (not_same) {
+        std::cerr << "abc == abc\n";
+      };
+      if (abc == abc3) {
+        std::cerr << "abc ==abc3\n";
+      }
+    }
     constexpr Array<size, CPair> c_pair = {
         make_pair(C(1, 2, 3), C(4, 5, 6)),
         make_pair(C(7, 8, 9), C(10, 11, 12))};
@@ -156,7 +199,7 @@ int main() {
     constexpr Array<size, CPair> c_pair2 = {
         make_pair(C(1, 2, 3), C(4, 5, 6)),
         make_pair(C(7, 8, 9), C(10, 11, 12))};
-    std::cout << (c_pair == c_pair2);
+    // std::cout << (c_pair == c_pair2);
   }
   // std::cout << c_pair;
   return 0;
