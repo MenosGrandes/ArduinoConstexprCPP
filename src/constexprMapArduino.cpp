@@ -113,7 +113,7 @@ struct C {
   int a;
   float f;
   double g;
-  constexpr C(int _a, float _f, double _g) : a(_a), f(_f), g(_g){};
+  constexpr explicit C(int _a, float _f, double _g) : a(_a), f(_f), g(_g){};
 };
 std::ostream &operator<<(std::ostream &out, const C &c) {
   out << "C[a=" << c.a << "| f=" << c.f << "| g=" << c.g << "]";
